@@ -1,0 +1,110 @@
+------------------------------- How to use two GitHub accounts? ----------------------------
+
+In my Windows Laptop:
+---------------------
+
+At present VSCode supports only one account logged in at a time. When you have multiple GitHub accounts, you have to log out of one account to work with another. However, it is a tedious process.
+
+This can be solved with a one-time solution using an SSH key.
+
+It is possible that you have tried many other solutions that tell you to use different custom domain names for different accounts while cloning the repository. But this has 2 problems:
+
+	1. Every time you clone you need to remember custom domain names.
+	2. And you manually need to update git-config files.
+
+	Solution:
+		1. Open git bash and go to .ssh
+			cd ~/.ssh
+
+		2. Check if you already have an SSH key
+			ls -al ~/.ssh #it ends with .pub extention.
+			note: If you have an SSH key then use that or else generate a new one.
+		
+		3. Generate a new SSH key
+			#execute one by one
+			ssh-keygen -t ed25519 -C "adapalapavan5@gmail.com" -f ~/.ssh/<Pavan-14>
+			ssh-keygen -t ed25519 -C "pavankumar.adapala.msc@gmail.com" -f ~/.ssh/<Pavan-Kumar-Adapala>
+
+			note:
+				-C: It is a comment used to identify the SSH key.
+				-f: It is a filename where the SSH key gets saved.
+				It asks for a passphrase just leave it empty and press enter.
+
+		4. check SSH-agent running or not, if not "Start SSH-agent"
+
+			check: ssh-agent # if you get PID, then SSH-agent is running otherwise it is not running.
+			
+			start SSH-agent: eval `ssh-agent -s`
+
+
+		5. Add SSH keys to SSH-agent
+
+			#execute one by one
+			ssh-add ~/.ssh/Pavan-14  #personal SSH key
+			ssh-add ~/.ssh/Pavan-Kumar-Adapala   #Company SSH key
+
+		6. Adding the public SSH key to GitHub
+
+			a. Open the .pub file on VScode or Vim and then copy the keys.
+			b. Then goto Github → Settings → Keys or https://github.com/settings/keys and click on the New SSH key.
+
+		7. Create config file
+			cd ~/.ssh/config
+				# Account 1 and 2 are GitHub accounts
+				# Account 1 (Pavan-14)
+				Host github-pavan14
+				  HostName github.com
+ 				  User git
+				  IdentityFile ~/.ssh/Pavan-14 # private key
+
+				# Account 2 (Another GitHub Account)
+				Host github-other
+				  HostName github.com
+				  User git
+				  IdentityFile ~/.ssh/Pavan-Kumar-Adapala # private key
+
+		8. To clone
+			a. create a repo in GitHub ex: docker
+
+			b. git clone git@github-other:Pavan-Kumar-Adapala/docker.git
+
+		8. Finally
+			From now on, to ensure that our commits and pushes from each repository on the system uses the correct GitHub user — we will have to configure user.email and user.name in every repository freshly cloned or existing before.
+
+			To do this use the following commands.
+
+     				git config user.email "my_office_email@gmail.com"
+     				git config user.name "Rahul Pandey"
+     
+     				git config user.email "my-personal-email@gmail.com"
+     				git config user.name "Rahul Pandey"
+			Pick the correct pair for your repository accordingly.
+
+			To push or pull to the correct account we need to add the remote origin to the project
+
+     				git remote add origin git@github-other:Pavan-Kumar-Adapalal
+     
+     				git remote add origin git@github-pavan14:pavan14
+			
+			Now you can use:
+
+     				git push
+     
+     				git pull
+
+				
+
+		PRO TIPS:
+			Use ssh -vvvvA -T git@github-other command to diagnose if anything goes wrong.
+			Use ssh-add -l to check all the ssh keys in ssh-agent.
+			Use git config --list to check all the conditions are working fine
+			If you are facing issue with know_hosts, then check the file existed or not (C:\Users\pavan\.ssh) and rename the existing one
+		Reference: 
+			- https://javascript.plainenglish.io/how-to-manage-multiple-github-accounts-in-vscode-using-ssh-keys-7f1a3adef58a
+			- https://gist.github.com/rahularity/86da20fe3858e6b311de068201d279e3
+			- https://dev.to/equiman/how-to-use-multiple-users-with-git-2e9l
+
+
+
+
+
